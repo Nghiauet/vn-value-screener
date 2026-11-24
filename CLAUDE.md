@@ -51,7 +51,9 @@ server.json    MCP Registry metadata (schema 2025-12-11); name io.github.Nghiaue
 1. Bump the version in `pyproject.toml`, `src/vn_value_screener/__init__.py` and `server.json` (both places), then
    run `check_versions.py`.
 2. Commit, then tag `vX.Y.Z` and push the tag. `release.yml` does the rest.
-3. To bump `mcp-publisher`: change `MCP_PUBLISHER_VERSION` and `MCP_PUBLISHER_SHA256` in `release.yml`. The sha256
+3. Actions are pinned to full commit hashes, with the version in a comment. setup-uv publishes no floating major
+   tag (`@v10` failed on 2026-11-24). Bump by resolving the new tag: `gh api repos/<owner>/<action>/git/ref/tags/<tag>`.
+4. To bump `mcp-publisher`: change `MCP_PUBLISHER_VERSION` and `MCP_PUBLISHER_SHA256` in `release.yml`. The sha256
    is the `mcp-publisher_linux_amd64.tar.gz` line in that release's `registry_<v>_checksums.txt`.
 
 The MCP Registry is still in preview (data resets possible). It stores only metadata; the code is the PyPI package.

@@ -29,8 +29,8 @@ jobs:
       contents: read
       id-token: write  # PyPI trusted publishing and the registry's GitHub OIDC login
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d  # v10.4.0
 
       - name: Tag, pyproject, package and server.json agree
         run: uv run python scripts/check_versions.py "${GITHUB_REF_NAME}"
@@ -38,7 +38,7 @@ jobs:
       - run: uv build
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
 
       - name: Wait until PyPI serves this version
         run: |
