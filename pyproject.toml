@@ -1,0 +1,39 @@
+[project]
+name = "vn-value-screener"
+version = "0.1.0"
+description = "MCP server: Graham- and Fisher-style screens of Vietnamese listed companies (HOSE, HNX, UPCOM)"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Nghiauet" }]
+requires-python = ">=3.11"
+dependencies = ["mcp>=2.3,<3"]
+keywords = ["mcp", "vietnam", "stocks", "value-investing", "graham", "fisher", "screener"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Intended Audience :: Education",
+]
+
+[project.urls]
+Repository = "https://github.com/Nghiauet/vn-value-screener"
+
+[project.scripts]
+vn-value-screener = "vn_value_screener.server:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vn_value_screener"]
+
+[tool.ruff]
+line-length = 110
+extend-exclude = ["src/vn_value_screener/engine"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

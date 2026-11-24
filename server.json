@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Nghiauet/vn-value-screener",
+  "title": "Vietnam Value Screener",
+  "description": "Graham and Fisher screens of Vietnamese listed stocks (HOSE, HNX, UPCOM) from public data",
+  "repository": {
+    "url": "https://github.com/Nghiauet/vn-value-screener",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "vn-value-screener",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "VN_VALUE_SCREENER_DATA_DIR",
+          "description": "Folder for the downloaded data (default: ~/.cache/vn-value-screener)",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "VN_VALUE_SCREENER_OFFLINE",
+          "description": "Set to 1 to answer from stored data only, never calling the API",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

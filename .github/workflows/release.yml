@@ -1,0 +1,63 @@
+# Push a tag vX.Y.Z → tests → PyPI (trusted publishing, no token) → MCP Registry (GitHub OIDC, no token).
+#
+# One-time setup by the owner, before the first tag:
+#   1. pypi.org → Your projects → Publishing → add a "pending publisher": project vn-value-screener,
+#      owner Nghiauet, repository vn-value-screener, workflow release.yml, environment pypi.
+#   2. GitHub repo → Settings → Environments → create "pypi" (optionally: require a reviewer).
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  MCP_PUBLISHER_VERSION: "1.8.16"
+  MCP_PUBLISHER_SHA256: "6e2f799550cf843c6fd3350498d56cc49be3dc0af1e6237eb0e6435c7a9d5c05"  # linux_amd64 tarball
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write  # PyPI trusted publishing and the registry's GitHub OIDC login
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+
+      - name: Tag, pyproject, package and server.json agree
+        run: uv run python scripts/check_versions.py "${GITHUB_REF_NAME}"
+
+      - run: uv build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Wait until PyPI serves this version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for _ in $(seq 1 30); do
+            if curl -fsS "https://pypi.org/pypi/vn-value-screener/${version}/json" > /dev/null; then exit 0; fi
+            sleep 10
+          done
+          echo "PyPI still doesn't list vn-value-screener ${version}" >&2
+          exit 1
+
+      - name: Install mcp-publisher (pinned, checksum-verified)
+        run: |
+          url="https://github.com/modelcontextprotocol/registry/releases/download/v${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz"
+          curl -fsSL -o mcp-publisher.tar.gz "$url"
+          echo "${MCP_PUBLISHER_SHA256}  mcp-publisher.tar.gz" | sha256sum -c -
+          tar -xzf mcp-publisher.tar.gz mcp-publisher
+
+      - name: Publish to the MCP Registry
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
